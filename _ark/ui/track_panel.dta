@@ -1,0 +1,128 @@
+#define TRACK_END_FRAME
+(1920)
+
+#define TRACK_PANEL_HANDLERS
+((enter
+   DX_TRACK_TEXTURE_HANDLER
+      {game add_sink $this}
+      DX_SET_TRACK_SPEED
+      {$this
+         set_showing
+         {if_else
+            {'||'
+               $skip_intro
+               {gamemode get is_drum_trainer}
+               {gamemode get is_practice}}
+            {gamemode get show_track}
+            FALSE}})
+   (exit
+      {game remove_sink $this})
+   (unison_hit)
+   (unison_miss)
+   (set_track_out)
+   (set_track_in)
+   (animate_track
+      ($start $end $period $units))
+   (animate_track_out)
+   (animate_track_out_fast)
+   (animate_track_in_fast)
+   (finish_load
+      {$this set_showing FALSE}
+      {$this set_track_out})
+   (intro_start
+      {$this reset}
+      {$this
+         set_showing
+         {gamemode get show_track}}
+      {$this set_track_in})
+   (intro_skip
+       {$this reset}
+      {$this
+         set_showing
+         {gamemode get show_track}}
+      {$this set_track_out}
+      {$this play_intro}
+   )
+   (on_reset
+      {beatmatch
+         foreach_active_player
+         $m
+         {$m on_new_track}
+         {{$m track}
+            init
+            {$m track}}}
+      {{$this loaded_dir}
+         reset})
+   (on_extend
+   {$this play_intro}
+      {if
+         {&&
+            {exists gamemode}
+            {gamemode get play_track_intro_sfx}}
+         {synth play track_beg.cue}
+		   {unless {> {gamecfg get practice_speed} 0} {beatmatch set_music_speed $speedmod}}
+		   {if {> {gamecfg get practice_speed} 0} {beatmatch set_music_speed $modifier}}}
+         {beatmatch set_kick_autoplay {modifier_mgr is_modifier_active mod_autokick}}
+         #ifndef HX_EE ; why does this not work on ps2
+         DX_CALLBACK_SETUP
+         DX_FC_SETUP
+         #endif
+   )
+)
+{new
+   TrackPanel
+   coop_track_panel
+   (file
+      #ifdef HX_EE
+      ../track/trackpanel.milo
+      #else
+      #ifdef HX_WII
+      ../track/trackpanel.milo
+      #else
+      {if_else $dx_queue_stock_track
+         ../track/trackpanel.milo
+         ../track/trackpanelcustom.milo
+      }
+      #endif
+      #endif
+   )
+   TRACK_PANEL_HANDLERS}
+{new
+   TrackPanel
+   h2h_track_panel
+   (file
+      {if_else
+         {==
+            {{game get_participant_config 0}
+               get_track_sym}
+            vocals}
+         ../track/trackpanel_h2h_vocals.milo
+
+      #ifdef HX_WII
+      ../track/trackpanel_h2h.milo
+      #else
+   {if_else $dx_queue_stock_track
+      ../track/trackpanel_h2h.milo
+      ../track/trackcustomh2h.milo
+   }
+   #endif
+   })
+   TRACK_PANEL_HANDLERS}
+{new
+   TrackPanel
+   hth_track_panel
+   (file
+      {if_else
+         {==
+            {{game get_participant_config 0}
+               get_track_sym}
+            vocals}
+         ../track/trackpanel_hth_vocals.milo
+         ../track/trackpanel_hth.milo})
+   TRACK_PANEL_HANDLERS}
+{func
+   get_track_panel
+   {gamemode get track_panel}}
+{set
+   $playback_file
+   ""}

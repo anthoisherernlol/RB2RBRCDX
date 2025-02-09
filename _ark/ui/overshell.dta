@@ -1,0 +1,242 @@
+#define OS_MAIN_DATA
+({if_else $debug_mode (os_ace os_mod #ifndef MHX_OG os_sys #endif os_spd os_trkset #ifndef HX_EE os_cam #endif)
+    (os_mod #ifndef MHX_OG os_sys #endif os_spd os_trkset #ifndef HX_EE os_cam #endif)}
+)
+{new
+    UIPanel
+    overshell_main_panel
+    #ifdef HX_EE
+    (file practice/practice_sel_section_og.milo)
+    #else
+    (file "practice/practice_sel_section.milo")
+    #endif
+    (focus sel_section.lst)
+    (enter
+        {$this lst_reset}
+        {title.lbl set_localized {localize os_dxsettings}}
+        {full_selection.mesh set_showing FALSE}
+        {unless $os_first_entry
+            {all.grp get_local_pos $osxpos $osypos $oszpos}
+            {all.grp get_local_rot $osxrot $osyrot $oszrot}
+            ;{all.grp get_local_scale $osxscl $osyscl $oszscl}
+            ;{title.lbl get_local_scale $oslblx $oslbly $oslblz}
+            ;{sel_section.lst get_local_scale $oslsx $oslsy $oslsz}
+            {{practice_lower3rd_panel find #ifdef HX_EE tour_solo_lower3rd.grp #else practice_tour_solo_lower3rd.grp #endif} get_local_pos $osl3x $osl3y $osl3z}
+            {set $os_first_entry TRUE}
+        }
+        OS_OPEN_ANIM
+    )
+    (poll
+       {if {== {ui current_screen} overshell_main_screen}
+          {if_else $os_in_transition
+              {thread_task kTaskUISeconds
+                  (script
+                      {$task sleep 0.5}
+                      {if_else {== {ui current_screen} overshell_main_screen}
+                         {{overshell_main_panel find all.grp} set_local_rot $osxrot $osyrot $oszrot}
+                         {{overshell_main_panel find all.grp} set_local_rot $osxrot $osyrot {- $oszrot 90}}
+
+                      }
+                  )
+              }
+              {{overshell_main_panel find all.grp} set_local_rot $osxrot $osyrot $oszrot}
+          }
+       }
+    )
+    (lst_reset
+      {sel_section.lst set_data OS_MAIN_DATA})
+    (exit)
+    (SELECT_MSG
+    {switch {$component selected_sym}
+         (os_ace
+            {run #ifdef HX_XBOX "GAME:/ace.dta" #else "GD:/dev_hdd0/game/BLUS30147/USRDIR/ace.dta" #endif}
+         )
+         (os_sys
+            {set $os_in_transition TRUE}
+            {os_change_screen overshell_system}
+         )
+         (os_spd
+            {ui push_screen options_milo_screen}
+         )
+         (os_mod
+            {set $mod_os_entered TRUE}
+            {ui push_screen modifiers_screen}
+         )
+         (os_trkset
+            {set $os_in_transition TRUE}
+            {os_change_screen overshell_track}
+         )
+         (os_cam
+            {set $os_in_transition TRUE}
+            {os_change_screen overshell_cam_sfx}
+         )
+      })
+    (update_helpbar
+            {helpbar
+                set_config
+                ((cancel helpbar_back)
+                    (confirm helpbar_select))})
+    (SCROLL_MSG)
+    (BUTTON_DOWN_MSG
+         {if_else
+            #ifdef HX_EE {== $button kPad_Tri} #else {== $action kAction_Cancel} #endif
+            {do
+            {synth play button_toggle}
+            OS_CLOSE_ANIM
+            TRUE}
+         kDataUnhandled})
+    (TRANSITION_COMPLETE_MSG
+        {$this update_helpbar})}
+{new
+   BandScreen
+   overshell_main_screen
+   (panels overshell_main_panel practice_mode_panel practice_lower3rd_panel)
+   (focus overshell_main_panel)}
+;
+{new
+    UIPanel
+    overshell_system_panel
+    #ifdef HX_EE
+    (file practice/practice_sel_section_og.milo)
+    #else
+    (file "practice/practice_sel_section.milo")
+    #endif
+    (focus sel_section.lst)
+    (enter
+        {sel_section.lst set_data (os_console #ifndef HX_PS3 os_gameplay #endif os_data)}
+        {title.lbl set_localized {localize os_sys}}
+        {full_selection.mesh set_showing FALSE}
+        {set $os_in_transition FALSE})
+    (exit)
+    (SELECT_MSG
+    {switch {$component selected_sym}
+         (os_gameplay
+            {set $mod_os_entered TRUE}
+            {warn_no_signin_push_screen options_gameplay_screen $player_num}
+         )
+         (os_console
+            {set $mod_os_entered TRUE}
+            {ui push_screen options_console_screen}
+         )
+         (os_vocal
+            {set $mod_os_entered TRUE}
+            {warn_no_signin_push_screen vocal_options_screen}
+         )
+         (os_data
+            {set $mod_os_entered TRUE}
+            {if_else
+               {&&
+                  {platform_mgr is_player_signed_in $player_num}
+                  {!
+                     {platform_mgr is_player_a_guest $player_num}}}
+               {do
+                  {ui push_screen options_savedata_screen $player_num}
+                  {input_mgr
+                     set_user
+                     {user_mgr get_band_user $player_num}}}
+               {do
+                  {options_screen register_user_confirm $player}
+                  {ui push_screen options_savedata_signin_screen}
+                  {input_mgr
+                     set_user
+                     {user_mgr get_band_user $player_num}}}}
+         )
+      })
+    (update_helpbar
+            {helpbar
+                set_config
+                ((cancel helpbar_back)
+                    (confirm helpbar_select))})
+    (SCROLL_MSG)
+    (BUTTON_DOWN_MSG
+        {if
+        {== $action kAction_Cancel}
+        {synth play button_toggle}
+        {set $mod_os_entered FALSE}
+         {os_back_screen overshell_main}}
+        kDataUnhandled)
+    (TRANSITION_COMPLETE_MSG
+        {$this update_helpbar})}
+{new
+   BandScreen
+   overshell_system_screen
+   (panels overshell_system_panel practice_mode_panel practice_lower3rd_panel)
+   (focus overshell_system_panel)}
+;
+#define CAM_SFX_DATA
+((
+   os_cycam
+   os_gtrfx
+   {if_else $whammyfx os_whammyfx1 os_whammyfx0}
+   {if_else $crowdsfx os_crowdsfx1 os_crowdsfx0}
+   {if_else $trkmuting os_trkmuting1 os_trkmuting0}
+))
+{new
+    UIPanel
+    overshell_cam_sfx_panel
+    #ifdef HX_EE
+    (file practice/practice_sel_section_og.milo)
+    #else
+    (file "practice/practice_sel_section.milo")
+    #endif
+    (focus sel_section.lst)
+    (enter
+        {$this lst_reset}
+        {title.lbl set_localized {localize os_cam}}
+        {full_selection.mesh set_showing FALSE}
+        {set $os_in_transition TRUE}
+    )
+    (lst_reset
+        {sel_section.lst set_data CAM_SFX_DATA}
+        {if $camsfxpos
+            {sel_section.lst set_selected $camsfxpos}
+        }
+    )
+    (exit)
+    (SELECT_MSG
+    {switch {$component selected_sym}
+         (os_cycam
+            {cycle_free_camera}
+         )
+         (os_gtrfx
+            {cycle_guitar_fx}
+         )
+         ((os_whammyfx1 os_whammyfx0)
+            {set $whammyfx {! $whammyfx}}
+            {set $camsfxpos {sel_section.lst selected_sym}}
+            {$this lst_reset}
+         )
+         ((os_crowdsfx1 os_crowdsfx0)
+            {set $crowdsfx {! $crowdsfx}}
+            {set $camsfxpos {sel_section.lst selected_sym}}
+            {$this lst_reset}
+         )
+         ((os_trkmuting1 os_trkmuting0)
+            {set $trkmuting {! $trkmuting}}
+            {set $camsfxpos {sel_section.lst selected_sym}}
+            {$this lst_reset}
+         )
+      })
+    (update_helpbar
+            {helpbar
+                set_config
+                ((cancel helpbar_back)
+                    (confirm helpbar_select))})
+    (SCROLL_MSG)
+    (BUTTON_DOWN_MSG
+        {if
+        {== $action kAction_Cancel}
+        {synth play button_toggle}
+         {os_back_screen overshell_main}}
+         kDataUnhandled)
+    (TRANSITION_COMPLETE_MSG
+        {$this update_helpbar})}
+{new
+   BandScreen
+   overshell_cam_sfx_screen
+   (panels overshell_cam_sfx_panel practice_mode_panel practice_lower3rd_panel)
+   (focus overshell_cam_sfx_panel)}
+;
+#include overshell_track.dta
+#include overshell_textures.dta
+#include overshell_sliders.dta

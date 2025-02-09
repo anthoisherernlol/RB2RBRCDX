@@ -1,0 +1,764 @@
+{new
+    UIPanel
+    overshell_tex_panel
+    #ifdef HX_EE
+    (file practice/practice_sel_section_og.milo)
+    #else
+    (file "practice/practice_sel_section.milo")
+    #endif
+    (focus sel_section.lst)
+    (enter
+        {sel_section.lst set_data (#ifndef MHX_OG os_hw #endif #ifndef HX_EE os_strk #endif os_spotlight os_gems os_smashers #ifndef HX_WII os_flames #endif os_sus #ifndef MHX_OG os_lanes os_font #endif #ifndef HX_WII os_score os_solobox os_stars os_crowd_meter os_bre os_rails os_odbar os_multi_ring #endif os_voxtrk)}
+        {title.lbl set_localized {localize os_tex1}}
+        {full_selection.mesh set_showing FALSE}
+        {set $os_in_transition FALSE}
+    )
+    (poll
+        {if {== {ui current_screen} overshell_tex_screen}
+            {if_else $os_in_transition
+                {thread_task kTaskUISeconds
+                    (script
+                        {$task sleep 1.0}
+                        {if_else {== {ui current_screen} overshell_tex_screen}
+                           {{overshell_tex_panel find all.grp} set_local_rot $osxrot $osyrot $oszrot}
+                           {{overshell_tex_panel find all.grp} set_local_rot $osxrot $osyrot {- $oszrot 90}}
+                        }
+                    )
+                }
+                {{overshell_tex_panel find all.grp} set_local_rot $osxrot $osyrot $oszrot}
+            }
+        }
+    )
+    (exit)
+    (SELECT_MSG
+    {switch {$component selected_sym}
+         (os_sus
+            {set $os_in_transition TRUE}
+            {os_change_screen overshell_sustains}
+         )
+         (os_lanes
+            {set $os_in_transition TRUE}
+            {set $dx_tracked_texture_loader lanes}
+            {os_change_screen overshell_texload}
+         )
+         (os_gems
+            {set $os_in_transition TRUE}
+            {set $dx_tracked_texture_loader gems}
+            {os_change_screen overshell_texload}
+         )
+         (os_smashers
+            {set $os_in_transition TRUE}
+            {set $dx_tracked_texture_loader smashers}
+            {os_change_screen overshell_texload}
+         )
+         (os_crowd_meter
+            {set $os_in_transition TRUE}
+            {set $dx_tracked_texture_loader crowd_meter}
+            {os_change_screen overshell_texload}
+         )
+         (os_font
+            {set $os_in_transition TRUE}
+            {set $dx_tracked_texture_loader font}
+            {os_change_screen overshell_texload}
+         )
+         (os_score
+            {set $os_in_transition TRUE}
+            {set $dx_tracked_texture_loader score}
+            {os_change_screen overshell_texload}
+         )
+         (os_solobox
+            {set $os_in_transition TRUE}
+            {set $dx_tracked_texture_loader solobox}
+            {os_change_screen overshell_texload}
+         )
+         (os_stars
+            {set $os_in_transition TRUE}
+            {set $dx_tracked_texture_loader stars}
+            {os_change_screen overshell_texload}
+         )
+         (os_bre
+            {set $os_in_transition TRUE}
+            {set $dx_tracked_texture_loader bre}
+            {os_change_screen overshell_texload}
+         )
+         (os_flames
+            {set $os_in_transition TRUE}
+            {set $dx_tracked_texture_loader flames}
+            {os_change_screen overshell_texload}
+         )
+         (os_rails
+            {set $os_in_transition TRUE}
+            {set $dx_tracked_texture_loader rails}
+            {os_change_screen overshell_texload}
+         )
+         (os_hw
+            {set $os_in_transition TRUE}
+            {set $dx_tracked_texture_loader highway}
+            {os_change_screen overshell_instrument_sel}
+         )
+         (os_strk
+            {set $os_in_transition TRUE}
+            {set $dx_tracked_texture_loader streak}
+            #ifdef MHX_OG
+            {set $dx_tracked_instrument bass}
+            {os_change_screen overshell_texload}
+            #else
+            {os_change_screen overshell_instrument_sel}
+            #endif
+         )
+         (os_spotlight
+            {set $os_in_transition TRUE}
+            {set $dx_tracked_texture_loader spotlight}
+            {os_change_screen overshell_instrument_sel}
+         )
+         (os_odbar
+            {set $os_in_transition TRUE}
+            {set $dx_tracked_texture_loader odbar}
+            {os_change_screen overshell_texload}
+         )
+         (os_multi_ring
+            {set $os_in_transition TRUE}
+            {set $dx_tracked_texture_loader multiring}
+            {os_change_screen overshell_texload}
+         )
+         (os_voxtrk
+            {set $os_in_transition TRUE}
+            {os_change_screen overshell_voxtrk}
+         )
+      })
+    (update_helpbar
+            {helpbar
+                set_config
+                ((cancel helpbar_back)
+                    (confirm helpbar_select))})
+    (SCROLL_MSG)
+    (BUTTON_DOWN_MSG
+        {if_else
+         #ifdef HX_EE {== $button kPad_Tri} #else {== $action kAction_Cancel} #endif
+         {do
+         {synth play button_toggle}
+         {set $os_in_transition TRUE}
+         #ifdef MHX_OG
+         {os_back_screen overshell_track}
+         #else
+         {os_back_screen overshell_trkpreset}
+         #endif
+         TRUE}
+         kDataUnhandled})
+    (TRANSITION_COMPLETE_MSG
+        {$this update_helpbar})}
+{new
+   BandScreen
+   overshell_tex_screen
+   (panels overshell_tex_panel practice_mode_panel practice_lower3rd_panel)
+   (focus overshell_tex_panel)}
+;
+{new
+    UIPanel
+    overshell_instrument_sel_panel
+    #ifdef HX_EE
+    (file practice/practice_sel_section_og.milo)
+    #else
+    (file "practice/practice_sel_section.milo")
+    #endif
+    (focus sel_section.lst)
+    (enter
+      {sel_section.lst set_data (os_spotlightall os_spotlightgtr os_spotlightbass os_spotlightdrum)}
+        {switch $dx_tracked_texture_loader
+         (highway
+            {title.lbl set_localized {localize os_hwheader}}
+         )
+         (spotlight
+            {title.lbl set_localized {localize os_spotlightheader}}
+         )
+         (streak
+            {title.lbl set_localized {localize os_strkheader}}
+         )
+        }
+        {full_selection.mesh set_showing FALSE}
+        {set $os_in_transition FALSE}
+    )
+    (poll
+        {if {== {ui current_screen} overshell_instrument_sel_screen}
+            {if_else $os_in_transition
+                {thread_task kTaskUISeconds
+                    (script
+                        {$task sleep 1.0}
+                        {if_else {== {ui current_screen} overshell_instrument_sel_screen}
+                           {{overshell_instrument_sel_panel find all.grp} set_local_rot $osxrot $osyrot $oszrot}
+                           {{overshell_instrument_sel_panel find all.grp} set_local_rot $osxrot $osyrot {- $oszrot 90}}
+                        }
+                    )
+                }
+                {{overshell_instrument_sel_panel find all.grp} set_local_rot $osxrot $osyrot $oszrot}
+            }
+        }
+    )
+    (exit)
+    (SELECT_MSG
+    {switch {$component selected_sym}
+         (os_spotlightall
+            {set $os_in_transition TRUE}
+            {set $dx_tracked_instrument all}
+            {os_change_screen overshell_texload}
+         )
+         (os_spotlightgtr
+            {set $os_in_transition TRUE}
+            {set $dx_tracked_instrument guitar}
+            {os_change_screen overshell_texload}
+         )
+         (os_spotlightbass
+            {set $os_in_transition TRUE}
+            {set $dx_tracked_instrument bass}
+            {os_change_screen overshell_texload}
+         )
+         (os_spotlightdrum
+            {set $os_in_transition TRUE}
+            {set $dx_tracked_instrument drum}
+            {os_change_screen overshell_texload}
+         )
+      })
+    (update_helpbar
+            {helpbar
+                set_config
+                ((cancel helpbar_back)
+                    (confirm helpbar_select))})
+    (SCROLL_MSG)
+    (BUTTON_DOWN_MSG
+        {if_else
+         #ifdef HX_EE {== $button kPad_Tri} #else {== $action kAction_Cancel} #endif
+         {do
+         {synth play button_toggle}
+         {set $os_in_transition TRUE}
+         {os_back_screen overshell_tex}
+         TRUE}
+         kDataUnhandled})
+    (TRANSITION_COMPLETE_MSG
+        {$this update_helpbar})}
+{new
+   BandScreen
+   overshell_instrument_sel_screen
+   (panels overshell_instrument_sel_panel practice_mode_panel practice_lower3rd_panel)
+   (focus overshell_instrument_sel_panel)}
+;
+{new
+    UIPanel
+    overshell_voxtrk_panel
+    #ifdef HX_EE
+    (file practice/practice_sel_section_og.milo)
+    #else
+    (file "practice/practice_sel_section.milo")
+    #endif
+    (focus sel_section.lst)
+    (enter
+        {sel_section.lst set_data (#ifndef HX_WII os_voxarrow os_voxhw #endif os_voxnotes os_voxod)}
+        {title.lbl set_localized {localize os_voxtrk1}}
+        {full_selection.mesh set_showing FALSE}
+        {set $os_in_transition FALSE}
+    )
+    (poll
+        {if {== {ui current_screen} overshell_voxtrk_screen}
+            {if_else $os_in_transition
+                {thread_task kTaskUISeconds
+                    (script
+                        {$task sleep 1.0}
+                        {if_else {== {ui current_screen} overshell_voxtrk_screen}
+                           {{overshell_voxtrk_panel find all.grp} set_local_rot $osxrot $osyrot $oszrot}
+                           {{overshell_voxtrk_panel find all.grp} set_local_rot $osxrot $osyrot {- $oszrot 90}}
+                        }
+                    )
+                }
+                {{overshell_voxtrk_panel find all.grp} set_local_rot $osxrot $osyrot $oszrot}
+            }
+        }
+    )
+    (exit)
+    (SELECT_MSG
+      {switch {$component selected_sym}
+         (os_voxarrow
+            {set $os_in_transition TRUE}
+            {set $dx_tracked_texture_loader voxarrow}
+            {os_change_screen overshell_texload}
+         )
+         (os_voxhw
+            {set $os_in_transition TRUE}
+            {set $dx_tracked_texture_loader voxhw}
+            {os_change_screen overshell_texload}
+         )
+         (os_voxnotes
+            {set $os_in_transition TRUE}
+            {set $dx_tracked_texture_loader voxnotes}
+            {os_change_screen overshell_texload}
+         )
+         (os_voxod
+            {set $os_in_transition TRUE}
+            {set $dx_tracked_texture_loader voxod}
+            {os_change_screen overshell_texload}
+         )
+      }
+    )
+    (update_helpbar
+            {helpbar
+                set_config
+                ((cancel helpbar_back)
+                    (confirm helpbar_select))})
+    (SCROLL_MSG)
+    (BUTTON_DOWN_MSG
+        {if_else
+         #ifdef HX_EE {== $button kPad_Tri} #else {== $action kAction_Cancel} #endif
+         {do
+         {synth play button_toggle}
+         {set $os_in_transition TRUE}
+         {os_back_screen overshell_tex}
+         TRUE}
+         kDataUnhandled})
+    (TRANSITION_COMPLETE_MSG
+        {$this update_helpbar})}
+{new
+   BandScreen
+   overshell_voxtrk_screen
+   (panels overshell_voxtrk_panel practice_mode_panel practice_lower3rd_panel)
+   (focus overshell_voxtrk_panel)}
+;
+{new
+    UIPanel
+    overshell_texload_panel
+    #ifdef HX_EE
+    (file practice/practice_sel_section_og.milo)
+    #else
+    (file "practice/practice_sel_section.milo")
+    #endif
+    (focus sel_section.lst)
+    (enter
+      {set $os_in_transition FALSE}
+      {full_selection.mesh set_showing FALSE}
+      {switch $dx_tracked_texture_loader
+         (gems
+            {sel_section.lst set_data #ifdef MHX_OG (#include ../track_og/gems/gems.dta) #else (#include ../track/gems/gems.dta) #endif}
+            {title.lbl set_localized {localize os_gems}}
+            #ifdef HX_WII
+            {anchor_corner02.tex set_bitmap {sprint "track_og/gems/prism_gems_" $gem ".png"}}
+            #else
+            {anchor_corner02.tex set_bitmap {sprint "track/gems/prism_gems_" $gem ".png"}}
+            #endif
+         )
+         (smashers
+            {sel_section.lst set_data #ifdef MHX_OG (#include ../track_og/smashers/smashers.dta) #else (#include ../track_new/smashers/smashers.dta) #endif}
+            {title.lbl set_localized {localize os_smashers}}
+            #ifdef HX_WII
+            {anchor_corner02.tex set_bitmap {sprint "track_og/smashers/smasher_color_" $smasher ".png"}}
+            #else
+            {anchor_corner02.tex set_bitmap {sprint "track_new/smashers/black_smasher_yellow_" $smasher ".png"}}
+            #endif
+         )
+         (crowd_meter
+            {sel_section.lst set_data (#include ../track/crowd_meter/crowd_meter.dta)}
+            {title.lbl set_localized {localize os_crowd_meter}}
+            {anchor_corner02.tex set_bitmap {sprint "track/crowd_meter/new_tube_" $crowdmetertex ".png"}}
+         )
+         (font
+            {sel_section.lst set_data (#include ../track/font/font.dta)}
+            {title.lbl set_localized {localize os_font}}
+            {anchor_corner02.tex set_bitmap {sprint "track/font/" $font ".png"}}
+         )
+         (score
+            {sel_section.lst set_data (#include ../track/score/score.dta)}
+            {title.lbl set_localized {localize os_score}}
+            {anchor_corner02.tex set_bitmap {sprint "track/score/indv_player_meter_" $scoretex ".png"}}
+         )
+         (solobox
+            {sel_section.lst set_data (#include ../track/solo_box/solo_box.dta)}
+            {title.lbl set_localized {localize os_solobox}}
+            {anchor_corner02.tex set_bitmap {sprint "track/solo_box/" $solobox ".png"}}
+         )
+         (stars
+            {sel_section.lst set_data (#include ../track/stars/stars.dta)}
+            {title.lbl set_localized {localize os_stars}}
+            {anchor_corner02.tex set_bitmap {sprint "track/stars/star_power_" $stars ".png"}}
+         )
+         (lanes
+            {sel_section.lst set_data (#include ../track/lanes/lanes.dta)}
+            {title.lbl set_localized {localize os_lanes}}
+            {anchor_corner02.tex set_bitmap {sprint "track/lanes/gem_mash_green_" $lanestex ".png"}}
+         )
+         (bre
+            {sel_section.lst set_data (#include ../track_new/bre/bre.dta)}
+            {title.lbl set_localized {localize os_bre}}
+            {anchor_corner02.tex set_bitmap {sprint "track_new/bre/bre_shield_" $bretex ".png"}}
+         )
+         (flames
+            {sel_section.lst set_data (#include ../track_new/flames/flames.dta)}
+            {title.lbl set_localized {localize os_flames}}
+            {anchor_corner02.tex set_bitmap {sprint "track_new/flames/sparks_" $flames ".png"}}
+         )
+         (rails
+            {sel_section.lst set_data (#include ../track/rails/rails.dta)}
+            {title.lbl set_localized {localize os_rails}}
+            {anchor_corner02.tex set_bitmap {sprint "track/rails/rails_" $rails ".png"}}
+         )
+         (highway
+            {sel_section.lst set_data (#include ../track_new/highways/highways.dta)}
+            {switch $dx_tracked_instrument
+               (guitar
+                  {anchor_corner02.tex set_bitmap {sprint "track_new/highways/" $highwaygtr ".png"}}
+                  {title.lbl set_localized {localize os_spotlightgtr}}
+               )
+               (bass
+                  {anchor_corner02.tex set_bitmap {sprint "track_new/highways/" $highwaybass ".png"}}
+                  {title.lbl set_localized {localize os_spotlightbass}}
+               )
+               (drum
+                  {anchor_corner02.tex set_bitmap {sprint "track_new/highways/" $highwaydrum ".png"}}
+                  {title.lbl set_localized {localize os_spotlightdrum}}
+               )
+               (all
+                  {anchor_corner02.tex set_bitmap {sprint "track_new/highways/" $highwaygtr ".png"}}
+                  {title.lbl set_localized {localize os_spotlightall}}
+               )
+            }
+         )
+         (streak
+            {sel_section.lst set_data (#include ../track_new/streak/streak.dta)}
+            {switch $dx_tracked_instrument
+               (guitar
+                  {anchor_corner02.tex set_bitmap {sprint "track_new/streak/" $streakgtr ".png"}}
+                  {title.lbl set_localized {localize os_spotlightgtr}}
+               )
+               (bass
+                  {anchor_corner02.tex set_bitmap {sprint "track_new/streak/" $streakbass ".png"}}
+                  #ifdef MHX_OG
+                  {title.lbl set_localized {localize os_strk}}
+                  #else
+                  {title.lbl set_localized {localize os_spotlightbass}}
+                  #endif
+               )
+               (drum
+                  {anchor_corner02.tex set_bitmap {sprint "track_new/streak/" $streakdrum ".png"}}
+                  {title.lbl set_localized {localize os_spotlightdrum}}
+               )
+               (all
+                  {anchor_corner02.tex set_bitmap {sprint "track_new/streak/" $streakgtr ".png"}}
+                  {title.lbl set_localized {localize os_spotlightall}}
+               )
+            }
+         )
+         (spotlight
+            {sel_section.lst set_data #ifdef MHX_OG (#include ../track_og/spotlight/spotlight.dta) #else (#include ../track_new/spotlight/spotlight.dta) #endif}
+            {switch $dx_tracked_instrument
+               (guitar
+                  #ifdef HX_WII
+                  {anchor_corner02.tex set_bitmap {sprint "track_og/spotlight/" $spotlightgtr ".png"}}
+                  #else
+                  {anchor_corner02.tex set_bitmap {sprint "track_new/spotlight/" $spotlightgtr ".png"}}
+                  #endif
+                  {title.lbl set_localized {localize os_spotlightgtr}}
+               )
+               (bass
+                  #ifdef HX_WII
+                  {anchor_corner02.tex set_bitmap {sprint "track_og/spotlight/" $spotlightdrum ".png"}}
+                  #else
+                  {anchor_corner02.tex set_bitmap {sprint "track_new/spotlight/" $spotlightbass ".png"}}
+                  #endif
+                  {title.lbl set_localized {localize os_spotlightbass}}
+               )
+               (drum
+                  #ifdef HX_WII
+                  {anchor_corner02.tex set_bitmap {sprint "track_og/spotlight/" $spotlightdrum ".png"}}
+                  #else
+                  {anchor_corner02.tex set_bitmap {sprint "track_new/spotlight/" $spotlightdrum ".png"}}
+                  #endif
+                  {title.lbl set_localized {localize os_spotlightdrum}}
+               )
+               (all
+                  #ifdef HX_WII
+                  {anchor_corner02.tex set_bitmap {sprint "track_og/spotlight/" $spotlightgtr ".png"}}
+                  #else
+                  {anchor_corner02.tex set_bitmap {sprint "track_new/spotlight/" $spotlightgtr ".png"}}
+                  #endif
+                  {title.lbl set_localized {localize os_spotlightall}}
+               )
+            }
+         )
+         (odbar
+            {sel_section.lst set_data (#include ../track/overdrive_bar/overdrive_bar.dta)}
+            {title.lbl set_localized {localize os_odbar}}
+            {anchor_corner02.tex set_bitmap {sprint "track/overdrive_bar/player_meter_background_" $odbar ".png"}}
+         )
+         (multiring
+            {sel_section.lst set_data (#include ../track/multiplier_ring/multiplier_ring.dta)}
+            {title.lbl set_localized {localize os_multi_ring}}
+            {anchor_corner02.tex set_bitmap {sprint "track/multiplier_ring/multiplier_cap_glass_vox_" $multiring ".png"}}
+         )
+         (voxarrow
+            {sel_section.lst set_data (#include ../track/voxarrow/voxarrow.dta)}
+            {title.lbl set_localized {localize os_voxarrow}}
+            {anchor_corner02.tex set_bitmap {sprint "track/voxarrow/pitch_arrow_split_" $voxarrow ".png"}}
+         )
+         (voxhw
+            {sel_section.lst set_data (#include ../track/voxhw/voxhw.dta)}
+            {title.lbl set_localized {localize os_voxhw}}
+            {anchor_corner02.tex set_bitmap {sprint "track/voxhw/vocal_bg_" $voxhw ".png"}}
+         )
+         (voxod
+            {sel_section.lst set_data (#include ../track/voxod/voxod.dta)}
+            {title.lbl set_localized {localize os_voxod}}
+            {anchor_corner02.tex set_bitmap {sprint "track/voxod/vox_now_bar_effect_" $voxod ".png"}}
+         )
+         (voxnotes
+            {sel_section.lst set_data (#include ../track/voxnotes/voxnotes.dta)}
+            {title.lbl set_localized {localize os_voxnotes}}
+            {anchor_corner02.tex set_bitmap {sprint "track/voxnotes/3d_tube_pitched_" $voxnotes ".png"}}
+         )
+      }
+        #ifndef HX_EE
+        {sit_gargoyle.mat set color {pack_color 1 1 1}}
+        {sit_gargoyle.mat set prelit TRUE}
+        {sit_gargoyle.mat set intensify FALSE}
+        {sit_gargoyle.mat set diffuse_tex anchor_corner02.tex}
+        {sit_gargoyle.mat set specular_map anchor_corner02.tex}
+        {sit_gargoyle02.mesh set_local_pos_index 2 -140}
+        #endif)
+    (exit)
+    (SELECT_MSG
+      {switch $dx_tracked_texture_loader
+         (gems
+            {set $gemcustomtexture TRUE}
+            {set $gem {$component selected_sym}}
+         )
+         (smashers
+            {set $smashercustomtexture TRUE}
+            {set $smasher {$component selected_sym}}
+         )
+         (crowd_meter
+            {set $crowdmetercustomtexture TRUE}
+            {set $crowdmetertex {$component selected_sym}}
+         )
+         (font
+            {set $fontcustomtexture TRUE}
+            {set $font {$component selected_sym}}
+         )
+         (score
+            {set $scorecustomtexture TRUE}
+            {set $scoretex {$component selected_sym}}
+         )
+         (solobox
+            {set $soloboxcustomtexture TRUE}
+            {set $solobox {$component selected_sym}}
+         )
+         (stars
+            {set $starscustomtexture TRUE}
+            {set $stars {$component selected_sym}}
+         )
+         (lanes
+            {set $lanescustomtexture TRUE}
+            {set $lanestex {$component selected_sym}}
+         )
+         (bre
+            {set $brecustomtexture TRUE}
+            {set $bretex {$component selected_sym}}
+         )
+         (flames
+            {set $flamescustomtexture TRUE}
+            {set $flames {$component selected_sym}}
+         )
+         (rails
+            {set $railscustomtexture TRUE}
+            {set $rails {$component selected_sym}}
+         )
+         (highway
+            {set $highwaycustomtexture TRUE}
+            {switch $dx_tracked_instrument
+               (guitar
+                  {set $highwaygtr {$component selected_sym}}
+               )
+               (bass
+                  {set $highwaybass {$component selected_sym}}
+               )
+               (drum
+                  {set $highwaydrum {$component selected_sym}}
+               )
+               (all
+                  {set $highwaygtr {$component selected_sym}}
+                  {set $highwaybass {$component selected_sym}}
+                  {set $highwaydrum {$component selected_sym}}
+               )
+            }
+         )
+         (streak
+            {set $streakcustomtexture TRUE}
+            {switch $dx_tracked_instrument
+               (guitar
+                  {set $streakgtr {$component selected_sym}}
+               )
+               (bass
+                  {set $streakbass {$component selected_sym}}
+               )
+               (drum
+                  {set $streakdrum {$component selected_sym}}
+               )
+               (all
+                  {set $streakgtr {$component selected_sym}}
+                  {set $streakbass {$component selected_sym}}
+                  {set $streakdrum {$component selected_sym}}
+               )
+            }
+         )
+         (spotlight
+            {switch $dx_tracked_instrument
+               (guitar
+                  {set $spotlightgtrcustomtexture TRUE}
+                  {set $spotlightgtr {$component selected_sym}}
+               )
+               (bass
+                  {set $spotlightbasscustomtexture TRUE}
+                  {set $spotlightbass {$component selected_sym}}
+               )
+               (drum
+                  {set $spotlightdrumcustomtexture TRUE}
+                  {set $spotlightdrum {$component selected_sym}}
+               )
+               (all
+                  {set $spotlightgtrcustomtexture TRUE}
+                  {set $spotlightbasscustomtexture TRUE}
+                  {set $spotlightdrumcustomtexture TRUE}
+                  {set $spotlightgtr {$component selected_sym}}
+                  {set $spotlightbass {$component selected_sym}}
+                  {set $spotlightdrum {$component selected_sym}}
+               )
+            }
+         )
+         (odbar
+            {set $odbarcustomtexture TRUE}
+          {set $odbar {$component selected_sym}}
+         )
+         (multiring
+            {set $multiringcustomtexture TRUE}
+            {set $multiring {$component selected_sym}}
+         )
+         (voxarrow
+            {set $voxarrowcustomtexture TRUE}
+            {set $voxarrow {$component selected_sym}}
+         )
+         (voxhw
+            {set $voxhwcustomtexture TRUE}
+            {set $voxhw {$component selected_sym}}
+         )
+         (voxod
+            {set $voxodcustomtexture TRUE}
+         {set $voxod {$component selected_sym}}
+         )
+         (voxnotes
+            {set $voxnotescustomtexture TRUE}
+            {set $voxnotes {$component selected_sym}}
+         )
+      }
+      {if_else {|| {== $dx_tracked_texture_loader voxarrow} {== $dx_tracked_texture_loader voxhw} {== $dx_tracked_texture_loader voxnotes} {== $dx_tracked_texture_loader voxod}}
+         {os_back_screen overshell_voxtrk}
+         {if_else {|| {== $dx_tracked_texture_loader highway} {== $dx_tracked_texture_loader spotlight} #ifndef HX_EE {== $dx_tracked_texture_loader streak} #endif}
+            {os_back_screen overshell_instrument_sel}
+            {os_back_screen overshell_tex}
+         }
+      }
+    )
+    (update_helpbar
+            {helpbar
+                set_config
+                ((cancel helpbar_back)
+                    (confirm helpbar_select))})
+    (SCROLL_MSG
+      {switch $dx_tracked_texture_loader
+         (gems
+            #ifdef HX_WII
+            {anchor_corner02.tex set_bitmap {sprint "track_og/gems/prism_gems_" {$component selected_sym} ".png"}}
+            #else
+            {anchor_corner02.tex set_bitmap {sprint "track/gems/prism_gems_" {$component selected_sym} ".png"}}
+            #endif
+         )
+         (smashers
+            #ifdef HX_WII
+            {anchor_corner02.tex set_bitmap {sprint "track_og/smashers/smasher_color_" {$component selected_sym} ".png"}}
+            #else
+            {anchor_corner02.tex set_bitmap {sprint "track_new/smashers/black_smasher_yellow_" {$component selected_sym} ".png"}}
+            #endif
+         )
+         (crowd_meter
+            {anchor_corner02.tex set_bitmap {sprint "track/crowd_meter/new_tube_" {$component selected_sym} ".png"}}
+         )
+         (font
+            {anchor_corner02.tex set_bitmap {sprint "track/font/" {$component selected_sym} ".png"}}
+         )
+         (score
+            {anchor_corner02.tex set_bitmap {sprint "track/score/indv_player_meter_" {$component selected_sym} ".png"}}
+         )
+         (solobox
+            {anchor_corner02.tex set_bitmap {sprint "track/solo_box/" {$component selected_sym} ".png"}}
+         )
+         (stars
+            {anchor_corner02.tex set_bitmap {sprint "track/stars/star_power_" {$component selected_sym} ".png"}}
+         )
+         (lanes
+            {anchor_corner02.tex set_bitmap {sprint "track/lanes/gem_mash_green_" {$component selected_sym} ".png"}}
+         )
+         (bre
+            {anchor_corner02.tex set_bitmap {sprint "track_new/bre/bre_shield_" {$component selected_sym} ".png"}}
+         )
+         (flames
+            {anchor_corner02.tex set_bitmap {sprint "track_new/flames/sparks_" {$component selected_sym} ".png"}}
+         )
+         (rails
+            {anchor_corner02.tex set_bitmap {sprint "track/rails/rails_" {$component selected_sym} ".png"}}
+         )
+         (highway
+            {anchor_corner02.tex set_bitmap {sprint "track_new/highways/" {$component selected_sym} ".png"}}
+         )
+         (streak
+            {anchor_corner02.tex set_bitmap {sprint "track_new/streak/" {$component selected_sym} ".png"}}
+         )
+         (spotlight
+            #ifdef HX_WII
+            {anchor_corner02.tex set_bitmap {sprint "track_og/spotlight/" {$component selected_sym} ".png"}}
+            #else
+            {anchor_corner02.tex set_bitmap {sprint "track_new/spotlight/" {$component selected_sym} ".png"}}
+            #endif
+         )
+         (odbar
+            {anchor_corner02.tex set_bitmap {sprint "track/overdrive_bar/player_meter_background_" {$component selected_sym} ".png"}}
+         )
+         (multiring
+            {anchor_corner02.tex set_bitmap {sprint "track/multiplier_ring/multiplier_cap_glass_vox_" {$component selected_sym} ".png"}}
+         )
+         (voxarrow
+            {anchor_corner02.tex set_bitmap {sprint "track/voxarrow/pitch_arrow_split_" {$component selected_sym} ".png"}}
+         )
+         (voxhw
+            {anchor_corner02.tex set_bitmap {sprint "track/voxhw/vocal_bg_" {$component selected_sym} ".png"}}
+         )
+         (voxod
+            {anchor_corner02.tex set_bitmap {sprint "track/voxod/vox_now_bar_effect_" {$component selected_sym} ".png"}}
+         )
+         (voxnotes
+            {anchor_corner02.tex set_bitmap {sprint "track/voxnotes/3d_tube_pitched_" {$component selected_sym} ".png"}}
+         )
+      }
+      )
+    (BUTTON_DOWN_MSG
+        {if_else
+         #ifdef HX_EE {== $button kPad_Tri} #else {== $action kAction_Cancel} #endif
+         {do
+         {synth play button_toggle}
+         {if_else {|| {== $dx_tracked_texture_loader voxarrow} {== $dx_tracked_texture_loader voxhw} {== $dx_tracked_texture_loader voxnotes} {== $dx_tracked_texture_loader voxod}}
+            {os_back_screen overshell_voxtrk}
+            {if_else {|| {== $dx_tracked_texture_loader highway} {== $dx_tracked_texture_loader spotlight} #ifndef MHX_OG {== $dx_tracked_texture_loader streak} #endif}
+               {os_back_screen overshell_instrument_sel}
+               {os_back_screen overshell_tex}
+            }
+         }
+         TRUE}
+         kDataUnhandled})
+    (TRANSITION_COMPLETE_MSG
+        {$this update_helpbar})}
+{new
+   BandScreen
+   overshell_texload_screen
+   (panels overshell_texload_panel practice_mode_panel practice_lower3rd_panel)
+   (focus overshell_texload_panel)}

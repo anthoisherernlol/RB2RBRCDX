@@ -1,0 +1,146 @@
+(use_xma FALSE)
+(oggvorbis
+	(keyindex 0)
+	
+#ifdef HX_XBOX
+	
+#ifdef _DEBUG
+	(throttle 0.50)
+	
+#else 
+	(throttle 0.20)
+	
+#endif 
+	
+#else 
+	(throttle 0.20)
+	
+#endif 
+)
+(iop
+	(max_streams 15)
+	(spu_buffers 60)
+	(max_slip 500))
+(metamusic
+	(volume -12.00)
+	(fade_time 2.00)
+	(music
+		shellmusic_aceofspades
+		shellmusic_badreputation
+		shellmusic_drainyou
+		shellmusic_everlong
+		shellmusic_hellothere
+		shellmusic_iwaswrong
+		shellmusic_kidsinamerica
+		shellmusic_shootingstar
+		shellmusic_getclean
+		shellmusic_neighborhood
+		shellmusic_nightlies
+		shellmusic_shoulder
+		shellmusic_blooddoll
+		shellmusic_cantletgo
+		shellmusic_imsosick
+		shellmusic_epic
+		shellmusic_gowiththeflow 
+                bat_country
+                bizarre_love_triangle
+                enjoy_the_silence
+                girls_not_grey_2
+                going_under
+                ignorance_pm
+                image_invisible
+                make_damn_sure
+                monster_sk
+                mr_crowley
+                nothing_good_time
+                possum_kingdom
+                rebel_love_song
+                x_los_angeles
+		swing_swing
+		word_up
+		a_punk
+                misery_business3
+                cant_hang
+                my_curse
+		)
+	(background_sfx
+		(sequence meta_people)
+		(min_delay_sec 10)
+		(max_delay_sec 20))
+	(play_from_memory TRUE))
+(fx
+	(chain FALSE)
+	(core_0
+		(mode kFXModeEcho)
+		(volume -10)
+		(delay 0.50)
+		(feedback -10))
+	(core_1
+		(mode kFXModeLargeStudio)
+		(volume -8)
+		(delay 0.00)
+		(feedback -96))
+	#ifdef HX_WII
+   (reverb_template
+      (mode kFXModeEcho)
+      (volume)
+      (time)
+      (delay)
+      (damping)
+      (coloration)
+      (crosstalk))
+   (delay_template
+      (mode kFXModeDelay)
+      (volume)
+      (delay)
+      (feedback))
+   (chorus_template
+      (mode kFXModeChorus)
+      (delay)
+      (variation)
+      (period))
+   (effect_0
+      (mode kFXModeFlanger)
+      (delay 5.2)
+      (depth 0.8)
+      (rate 0.56)
+      (feedback 0.5))
+   (effect_1
+      (mode kFXModeDelay)
+      (volume 100)
+      (delay 150)
+      (feedback 0))
+   (effect_2
+      (mode kFXModeDelay)
+      (volume 90)
+      (delay 400)
+      (feedback 50))
+   (effect_3
+      (mode kFXModeChorus)
+      (delay 50)
+      (variation 15)
+      (period 4000))
+   (effect_4
+      (mode kFXModeOff))
+   (effect_5
+      (mode kFXModeEcho)
+      (volume 0.32)
+      (time 2.0)
+      (delay 0.1)
+      (damping 0.8)
+      (coloration 0.6)
+      (crosstalk 0.3))
+   (effect_6
+      (mode kFXModePitchShift))
+   #endif)
+(mics
+	
+#ifdef HX_PS3
+	8
+	
+#else 
+	4
+	
+#endif 
+)
+(mic (volume 0))
