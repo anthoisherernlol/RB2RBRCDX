@@ -44,6 +44,17 @@
    (classic_rockers
       (keywords classicrock rock prog the60s the70s the80s the90s)
       (characters rb2drum6 rb2drum7 rb2drum11 guitar9 guitar20 vocals1 vocals7 vocals9 rb2guitar0 rb2guitar4 rb2guitar5 drum8 guitar8 guitar21))
+   (mainstream_pop
+      (keywords popdanceelectronic the00s the10s)
+      (characters rb2drum16 drum3 drum16 guitar7 guitar10 guitar11 guitar28 guitar32 vocals0 vocals2 vocals4 vocals5 vocals13 vocals20
+                 helena_st chill annai_renae galaxis))
+   (disco_dancers
+      (keywords popdanceelectronic the60s the70s the80s the90s)
+      (characters rb2drum1 rb2drum2 rb2drum6 rb2drum10 rb2drum14 rb2drum15 rb2guitar0 rb2guitar3 rb2guitar4 rb2guitar5 drum6 drum10 guitar0 guitar1 guitar32 vocals8 vocals9 vocals15 
+               luna chill galaxis))
+   (rap_rockers
+      (keywords hiphoprap urban the70s the80s the90s the00s the10s)
+      (characters rb2drum3 rb2drum10 rb2guitar4 drum1 drum2 drum6 drum13 drum14 drum16 guitar3 guitar26 guitar31 guitar33 vocals0 vocals2 vocals4 vocals13))
    (emoscene_kids
       (keywords alternative poprock emo punk the00s the10s)
       (characters drum15 drum17 guitar2 guitar7 guitar29 guitar31 vocals4 vocals17 vocals19
