@@ -95,7 +95,7 @@
    (uisink_signout_screen main_screen)
    (quit_early_screen main_screen)
    (band_name
-      "ROCK BAND")
+      "ROAD CREW")
    (band_logo 0)
    (track_panel coop_track_panel)
    (is_solo
